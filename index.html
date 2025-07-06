@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head><title>GitHub Events</title></head>
+<body>
+<h2>Repository Events</h2>
+<ul id="event-list"></ul>
+
+<script>
+  async function loadEvents() {
+    const res = await fetch('/events');
+    const data = await res.json();
+    const list = document.getElementById('event-list');
+    list.innerHTML = '';
+    data.forEach(event => {
+      const time = new Date(event.timestamp).toUTCString();
+      let msg = '';
+      if (event.action === 'push') {
+        msg = `"${event.author}" pushed to "${event.to_branch}" on ${time}`;
+      } else if (event.action === 'pull_request') {
+        msg = `"${event.author}" submitted a pull request from "${event.from_branch}" to "${event.to_branch}" on ${time}`;
+      } else if (event.action === 'merge') {
+        msg = `"${event.author}" merged branch "${event.from_branch}" to "${event.to_branch}" on ${time}`;
+      }
+      const li = document.createElement('li');
+      li.textContent = msg;
+      list.appendChild(li);
+    });
+  }
+
+  loadEvents();
+  setInterval(loadEvents, 15000);
+</script>
+</body>
+</html>
